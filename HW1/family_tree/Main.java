@@ -1,4 +1,4 @@
 package family_tree;
 
-public class Human {
+public class Main {
 }

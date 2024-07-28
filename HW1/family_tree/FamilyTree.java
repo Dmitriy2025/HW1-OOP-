@@ -1,2 +1,4 @@
-package family_tree;public class FamilyTree {
+package family_tree;
+
+public class FamilyTree {
 }
