@@ -87,8 +87,35 @@ public class Human {
     @Override
     public String toString() {
         String genderString = gender == Gender.Male ? "мужчина" : "женщина";
-        return "id: " + id + ", " + name + " (" + genderString + ", родился " + birthDate +
-                (deathDate != null ? ", умер " + deathDate : "") + ")";
+        StringBuilder result = new StringBuilder();
+        result.append(id).append(": ").append(name).append(" (").append(genderString)
+                .append(", родился ").append(birthDate);
+        if (deathDate != null) {
+            result.append(", умер ").append(deathDate);
+        }
+        result.append(")");
+
+        if (!parents.isEmpty()) {
+            result.append("; родители: ");
+            for (Human parent : parents) {
+                result.append(parent.getName()).append(", ");
+            }
+            if (result.length() > 0) {
+                result.setLength(result.length() - 2);
+            }
+        }
+
+        if (!children.isEmpty()) {
+            result.append("; дети: ");
+            for (Human child : children) {
+                result.append(child.getName()).append(", ");
+            }
+            if (result.length() > 0) {
+                result.setLength(result.length() - 2);
+            }
+        }
+
+        return result.toString();
     }
 }
 
