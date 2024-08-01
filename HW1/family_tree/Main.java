@@ -4,7 +4,8 @@ public class Main {
         FamilyTree familyTree = new FamilyTree();
         familyTree.populateFamilyTree();
 
-        familyTree.showMenu();
+        FamilyTreeConsole familyTreeConsole = new FamilyTreeConsole(familyTree);
+        familyTreeConsole.showMenu();
     }
 }
 
