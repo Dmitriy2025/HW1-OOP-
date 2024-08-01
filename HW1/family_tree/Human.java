@@ -1,10 +1,13 @@
 package family_tree;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Human {
+public class Human implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int id;
     private String name;
     private Gender gender;
@@ -23,7 +26,8 @@ public class Human {
         this.children = new ArrayList<>();
     }
 
-    // Геттеры
+    // Геттеры и сеттеры
+
     public int getId() {
         return id;
     }
@@ -52,7 +56,6 @@ public class Human {
         return new ArrayList<>(children);
     }
 
-    // Сеттеры
     public void setName(String name) {
         this.name = name;
     }
@@ -68,7 +71,6 @@ public class Human {
     public void setDeathDate(LocalDate deathDate) {
         this.deathDate = deathDate;
     }
-
 
     public void addParent(Human parent) {
         if (!parents.contains(parent)) {
