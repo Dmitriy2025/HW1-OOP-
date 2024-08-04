@@ -1,15 +1,17 @@
 package family_tree;
 
-import family_tree.writer.FileHandler;
+import family_tree.writer.Writer;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
 public class FamilyTreeConsole {
     private FamilyTree familyTree;
+    private Writer fileHandler;
 
-    public FamilyTreeConsole(FamilyTree familyTree) {
+    public FamilyTreeConsole(FamilyTree familyTree, Writer fileHandler) {
         this.familyTree = familyTree;
+        this.fileHandler = fileHandler;
     }
 
     public void showMenu() {
@@ -159,16 +161,25 @@ public class FamilyTreeConsole {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя файла для сохранения: ");
         String filename = scanner.nextLine();
-        FileHandler.saveFamilyTree(familyTree, filename);
+        fileHandler.setPath(filename);
+        if (fileHandler.saveFamilyTree(familyTree)) {
+            System.out.println("Генеалогическое древо сохранено в файл " + filename);
+        } else {
+            System.out.println("Ошибка при сохранении генеалогического древа.");
+        }
     }
 
     private void loadFamilyTreeInteractive() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя файла для загрузки: ");
         String filename = scanner.nextLine();
-        FamilyTree loadedFamilyTree = FileHandler.loadFamilyTree(filename);
+        fileHandler.setPath(filename);
+        FamilyTree loadedFamilyTree = (FamilyTree) fileHandler.read();
         if (loadedFamilyTree != null) {
             familyTree = loadedFamilyTree;
+            System.out.println("Генеалогическое древо загружено из файла " + filename);
+        } else {
+            System.out.println("Ошибка при загрузке генеалогического древа.");
         }
     }
 }
