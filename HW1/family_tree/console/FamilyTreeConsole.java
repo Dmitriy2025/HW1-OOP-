@@ -1,9 +1,13 @@
-package family_tree;
+package family_tree.console;
 
+import family_tree.data.FamilyTree;
+import family_tree.data.Gender;
+import family_tree.data.Human;
 import family_tree.writer.Writer;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
+
 
 public class FamilyTreeConsole {
     private FamilyTree familyTree;
@@ -25,7 +29,9 @@ public class FamilyTreeConsole {
             System.out.println("5. Найти родителей человека");
             System.out.println("6. Сохранить генеалогическое древо в файл");
             System.out.println("7. Загрузить генеалогическое древо из файла");
-            System.out.println("8. Выйти");
+            System.out.println("8. Сортировать по имени");
+            System.out.println("9. Сортировать по возрасту");
+            System.out.println("0. Выйти");
 
             System.out.print("Выберите опцию: ");
             int choice = scanner.nextInt();
@@ -55,6 +61,16 @@ public class FamilyTreeConsole {
                     loadFamilyTreeInteractive();
                     break;
                 case 8:
+                    familyTree.sortByName();
+                    System.out.println("Генеалогическое древо отсортировано по имени:");
+                    System.out.println(familyTree);
+                    break;
+                case 9:
+                    familyTree.sortByAge();
+                    System.out.println("Генеалогическое древо отсортировано по возрасту:");
+                    System.out.println(familyTree);
+                    break;
+                case 0:
                     System.out.println("Выход...");
                     return;
                 default:

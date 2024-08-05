@@ -1,11 +1,10 @@
-package family_tree;
+package family_tree.data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class FamilyTree implements Serializable {
+public class FamilyTree implements Serializable, Iterable<Human> {
     private static final long serialVersionUID = 1L;
 
     private List<Human> people;
@@ -53,6 +52,19 @@ public class FamilyTree implements Serializable {
             return person.getParents();
         }
         return null;
+    }
+
+    public void sortByName() {
+        Collections.sort(people, Comparator.comparing(Human::getName));
+    }
+
+    public void sortByAge() {
+        Collections.sort(people, Comparator.comparing(Human::getBirthDate));
+    }
+
+    @Override
+    public Iterator<Human> iterator() {
+        return people.iterator();
     }
 
     @Override
