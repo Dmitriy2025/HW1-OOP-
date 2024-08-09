@@ -3,17 +3,18 @@ package family_tree.console;
 import family_tree.data.FamilyTree;
 import family_tree.data.Gender;
 import family_tree.data.Human;
+import family_tree.data.Sortable;
 import family_tree.writer.Writer;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
 
-public class FamilyTreeConsole {
-    private FamilyTree familyTree;
+public class FamilyTreeConsole<T extends Sortable> {
+    private FamilyTree<T> familyTree;
     private Writer fileHandler;
 
-    public FamilyTreeConsole(FamilyTree familyTree, Writer fileHandler) {
+    public FamilyTreeConsole(FamilyTree<T> familyTree, Writer fileHandler) {
         this.familyTree = familyTree;
         this.fileHandler = fileHandler;
     }
@@ -23,10 +24,10 @@ public class FamilyTreeConsole {
         while (true) {
             System.out.println("\nМеню:");
             System.out.println("1. Показать генеалогическое древо");
-            System.out.println("2. Найти человека по имени или id");
-            System.out.println("3. Добавить человека в генеалогическое древо");
-            System.out.println("4. Найти детей человека");
-            System.out.println("5. Найти родителей человека");
+            System.out.println("2. Найти субъекта по имени или id");
+            System.out.println("3. Добавить субъект в генеалогическое древо");
+            System.out.println("4. Найти детей субъекта");
+            System.out.println("5. Найти родителей субъекта");
             System.out.println("6. Сохранить генеалогическое древо в файл");
             System.out.println("7. Загрузить генеалогическое древо из файла");
             System.out.println("8. Сортировать по имени");
@@ -83,7 +84,7 @@ public class FamilyTreeConsole {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя или ID: ");
         String input = scanner.nextLine();
-        Human person;
+        Sortable person;
         try {
             int id = Integer.parseInt(input);
             person = familyTree.findPersonById(id);
@@ -91,9 +92,9 @@ public class FamilyTreeConsole {
             person = familyTree.findPersonByName(input);
         }
         if (person != null) {
-            System.out.println("Найденный человек: " + person);
+            System.out.println("Найденный субъект: " + person);
         } else {
-            System.out.println("Человек не найден.");
+            System.out.println("Субъект не найден.");
         }
     }
 
@@ -103,9 +104,22 @@ public class FamilyTreeConsole {
         System.out.print("Введите имя: ");
         String name = scanner.nextLine();
 
-        System.out.print("Введите пол (мужчина/женщина): ");
+        System.out.print("Введите тип (Human/Dog): ");
+        String typeInput = scanner.nextLine();
+        Class<T> type;
+
+        if ("Human".equalsIgnoreCase(typeInput)) {
+            type = (Class<T>) Human.class;
+        //} else if ("Dog".equalsIgnoreCase(typeInput)) {
+        //    type = (Class<T>) Dog.class;
+        } else {
+            System.out.println("Неизвестный тип.");
+            return;
+        }
+
+        System.out.print("Введите пол (мужской/женский): ");
         String genderInput = scanner.nextLine();
-        Gender gender = genderInput.equalsIgnoreCase("мужчина") ? Gender.Male : Gender.Female;
+        Gender gender = genderInput.equalsIgnoreCase("мужской") ? Gender.Male : Gender.Female;
 
         System.out.print("Введите дату рождения (ГГГГ-ММ-ДД): ");
         LocalDate birthDate = LocalDate.parse(scanner.nextLine());
@@ -114,14 +128,15 @@ public class FamilyTreeConsole {
         String deathDateInput = scanner.nextLine();
         LocalDate deathDate = deathDateInput.isEmpty() ? null : LocalDate.parse(deathDateInput);
 
-        familyTree.addPerson(name, gender, birthDate, deathDate);
+        familyTree.addPerson(name, gender, birthDate, deathDate, type);
+
+        Sortable newPerson = familyTree.findPersonByName(name);
 
         System.out.print("Введите имя родителя (или оставьте пустым, если нет): ");
         String parentName = scanner.nextLine();
         if (!parentName.isEmpty()) {
-            Human parent = familyTree.findPersonByName(parentName);
+            Sortable parent = familyTree.findPersonByName(parentName);
             if (parent != null) {
-                Human newPerson = familyTree.findPersonByName(name);
                 newPerson.addParent(parent);
             } else {
                 System.out.println("Родитель с таким именем не найден.");
@@ -131,26 +146,25 @@ public class FamilyTreeConsole {
         System.out.print("Введите имя ребенка (или оставьте пустым, если нет): ");
         String childName = scanner.nextLine();
         if (!childName.isEmpty()) {
-            Human child = familyTree.findPersonByName(childName);
+            Sortable child = familyTree.findPersonByName(childName);
             if (child != null) {
-                Human newPerson = familyTree.findPersonByName(name);
                 newPerson.addChild(child);
             } else {
                 System.out.println("Ребенок с таким именем не найден.");
             }
         }
 
-        System.out.println("Новый человек добавлен: " + familyTree.findPersonByName(name));
+        System.out.println("Новый " + type + " добавлен: " + newPerson);
     }
 
     private void findChildrenInteractive() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя: ");
         String name = scanner.nextLine();
-        List<Human> children = familyTree.getChildrenOf(name);
+        List<T> children = familyTree.getChildrenOf(name);
         if (children != null && !children.isEmpty()) {
-            System.out.println("Дети человека " + name + ":");
-            for (Human child : children) {
+            System.out.println("Дети субъекта " + name + ":");
+            for (T child : children) {
                 System.out.println(child);
             }
         } else {
@@ -162,10 +176,10 @@ public class FamilyTreeConsole {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя: ");
         String name = scanner.nextLine();
-        List<Human> parents = familyTree.getParentsOf(name);
+        List<T> parents = familyTree.getParentsOf(name);
         if (parents != null && !parents.isEmpty()) {
-            System.out.println("Родители человека " + name + ":");
-            for (Human parent : parents) {
+            System.out.println("Родители субъекта " + name + ":");
+            for (T parent : parents) {
                 System.out.println(parent);
             }
         } else {

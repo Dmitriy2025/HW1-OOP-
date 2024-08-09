@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Human implements Serializable {
+public class Human implements Serializable, Sortable {
     private static final long serialVersionUID = 1L;
 
     private int id;
@@ -13,8 +13,8 @@ public class Human implements Serializable {
     private Gender gender;
     private LocalDate birthDate;
     private LocalDate deathDate;
-    private List<Human> parents;
-    private List<Human> children;
+    private List<Sortable> parents;
+    private List<Sortable> children;
 
     public Human(int id, String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
         this.id = id;
@@ -26,69 +26,55 @@ public class Human implements Serializable {
         this.children = new ArrayList<>();
     }
 
-    // Геттеры и сеттеры
-
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
-    public Gender getGender() {
-        return gender;
-    }
-
+    @Override
     public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public LocalDate getDeathDate() {
-        return deathDate;
-    }
-
-    public List<Human> getParents() {
-        return new ArrayList<>(parents);
-    }
-
-    public List<Human> getChildren() {
-        return new ArrayList<>(children);
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public void setDeathDate(LocalDate deathDate) {
-        this.deathDate = deathDate;
-    }
-
-    public void addParent(Human parent) {
-        if (!parents.contains(parent)) {
-            this.parents.add(parent);
-            parent.addChild(this);
-        }
-    }
-
-    public void addChild(Human child) {
-        if (!children.contains(child)) {
-            this.children.add(child);
-            child.addParent(this);
+    @Override
+    public void addParent(Sortable parent) {
+        if (parent instanceof Human) {
+            if (!parents.contains(parent)) {
+                this.parents.add(parent);
+                ((Human) parent).addChild(this);
+            }
         }
     }
 
     @Override
+    public void addChild(Sortable child) {
+        if (child instanceof Human) {
+            if (!children.contains(child)) {
+                this.children.add(child);
+                ((Human) child).addParent(this);
+            }
+        }
+    }
+
+    @Override
+    public List<Sortable> getChildren() {
+        return new ArrayList<>(children);
+    }
+
+    @Override
+    public List<Sortable> getParents() {
+        return new ArrayList<>(parents);
+    }
+
+    @Override
     public String toString() {
-        String genderString = gender == Gender.Male ? "мужчина" : "женщина";
+        // Обновленный toString метод
+        String genderString = gender == Gender.Male ? "пол: мужской" : "пол: женский";
         StringBuilder result = new StringBuilder();
         result.append(id).append(": ").append(name).append(" (").append(genderString)
                 .append(", родился ").append(birthDate);
@@ -99,7 +85,7 @@ public class Human implements Serializable {
 
         if (!parents.isEmpty()) {
             result.append("; родители: ");
-            for (Human parent : parents) {
+            for (Sortable parent : parents) {
                 result.append(parent.getName()).append(", ");
             }
             if (result.length() > 0) {
@@ -109,7 +95,7 @@ public class Human implements Serializable {
 
         if (!children.isEmpty()) {
             result.append("; дети: ");
-            for (Human child : children) {
+            for (Sortable child : children) {
                 result.append(child.getName()).append(", ");
             }
             if (result.length() > 0) {
