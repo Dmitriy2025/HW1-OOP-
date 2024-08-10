@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Human implements Serializable, Sortable {
+public class Dog implements Serializable, Sortable {
     private static final long serialVersionUID = 1L;
 
     private int id;
@@ -16,7 +16,7 @@ public class Human implements Serializable, Sortable {
     private List<Sortable> parents;
     private List<Sortable> children;
 
-    public Human(int id, String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
+    public Dog(int id, String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
         this.id = id;
         this.name = name;
         this.gender = gender;
@@ -43,20 +43,20 @@ public class Human implements Serializable, Sortable {
 
     @Override
     public void addParent(Sortable parent) {
-        if (parent instanceof Human) {
+        if (parent instanceof Dog) {
             if (!parents.contains(parent)) {
                 this.parents.add(parent);
-                ((Human) parent).addChild(this);
+                ((Dog) parent).addChild(this);
             }
         }
     }
 
     @Override
     public void addChild(Sortable child) {
-        if (child instanceof Human) {
+        if (child instanceof Dog) {
             if (!children.contains(child)) {
                 this.children.add(child);
-                ((Human) child).addParent(this);
+                ((Dog) child).addParent(this);
             }
         }
     }
@@ -105,5 +105,3 @@ public class Human implements Serializable, Sortable {
         return result.toString();
     }
 }
-
-

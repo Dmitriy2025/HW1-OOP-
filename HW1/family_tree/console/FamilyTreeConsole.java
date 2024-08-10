@@ -3,8 +3,11 @@ package family_tree.console;
 import family_tree.data.FamilyTree;
 import family_tree.data.Gender;
 import family_tree.data.Human;
+import family_tree.data.Dog;
 import family_tree.data.Sortable;
 import family_tree.writer.Writer;
+import org.w3c.dom.ls.LSOutput;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -101,25 +104,38 @@ public class FamilyTreeConsole<T extends Sortable> {
     private void addPersonInteractive() {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Введите имя: ");
-        String name = scanner.nextLine();
-
-        System.out.print("Введите тип (Human/Dog): ");
+        System.out.print("Введите тип (Человек/Собака): ");
         String typeInput = scanner.nextLine();
         Class<T> type;
-
-        if ("Human".equalsIgnoreCase(typeInput)) {
+        if ("Человек".equalsIgnoreCase(typeInput)) {
             type = (Class<T>) Human.class;
-        //} else if ("Dog".equalsIgnoreCase(typeInput)) {
-        //    type = (Class<T>) Dog.class;
+        } else if ("Собака".equalsIgnoreCase(typeInput)) {
+            type = (Class<T>) Dog.class;
         } else {
             System.out.println("Неизвестный тип.");
             return;
         }
 
+        if (familyTree.getCurrentType() != null && !familyTree.getCurrentType().equals(type)) {
+            System.out.println("Ошибка: нельзя смешивать типы ЧЕЛОВЕК и СОБАКА в одном генеалогическом древе.");
+            return;
+        }
+
+        System.out.print("Введите имя: ");
+        String name = scanner.nextLine();
+
         System.out.print("Введите пол (мужской/женский): ");
-        String genderInput = scanner.nextLine();
-        Gender gender = genderInput.equalsIgnoreCase("мужской") ? Gender.Male : Gender.Female;
+        Gender gender = null;
+        while (gender == null) {
+            String genderInput = scanner.nextLine().trim().toLowerCase();
+            if (genderInput.equals("мужской")) {
+                gender = Gender.Male;
+            } else if (genderInput.equals("женский")) {
+                gender = Gender.Female;
+            } else {
+                System.out.print("Некорректный ввод. Пожалуйста, введите 'мужской' или 'женский': ");
+            }
+        }
 
         System.out.print("Введите дату рождения (ГГГГ-ММ-ДД): ");
         LocalDate birthDate = LocalDate.parse(scanner.nextLine());
@@ -138,6 +154,7 @@ public class FamilyTreeConsole<T extends Sortable> {
             Sortable parent = familyTree.findPersonByName(parentName);
             if (parent != null) {
                 newPerson.addParent(parent);
+                System.out.println();
             } else {
                 System.out.println("Родитель с таким именем не найден.");
             }
@@ -149,12 +166,14 @@ public class FamilyTreeConsole<T extends Sortable> {
             Sortable child = familyTree.findPersonByName(childName);
             if (child != null) {
                 newPerson.addChild(child);
+                System.out.println();
             } else {
                 System.out.println("Ребенок с таким именем не найден.");
             }
         }
 
-        System.out.println("Новый " + type + " добавлен: " + newPerson);
+        String typeName = type.equals(Human.class) ? "человек" : "собака";
+        System.out.println("Новый субъект " + typeName + " добавлен: " + newPerson);
     }
 
     private void findChildrenInteractive() {
