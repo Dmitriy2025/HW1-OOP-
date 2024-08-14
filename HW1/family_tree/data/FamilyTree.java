@@ -11,10 +11,10 @@ public class FamilyTree<T extends Sortable> implements Serializable, Iterable<T>
     private int nextId;
     private Class<T> currentType;
 
-    public FamilyTree() {
+    public FamilyTree(Class<T> type) {
         this.people = new ArrayList<>();
         this.nextId = 1;
-        this.currentType = null;
+        this.currentType = type;
     }
 
     public Class<T> getCurrentType() {
@@ -22,20 +22,13 @@ public class FamilyTree<T extends Sortable> implements Serializable, Iterable<T>
     }
 
     public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate, Class<T> type) {
-        if (currentType == null) {
-            currentType = type;
-        } else if (!currentType.equals(type)) {
-            System.out.println("Ошибка: нельзя смешивать типы ЧЕЛОВЕК и СОБАКА в одном генеалогическом древе.");
-            return;
-        }
-
         try {
             T newPerson = type.getConstructor(int.class, String.class, Gender.class, LocalDate.class, LocalDate.class)
                     .newInstance(nextId++, name, gender, birthDate, deathDate);
             this.people.add(newPerson);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Не удалось добавить нового субъекта.");
+            System.out.println("Ошибка: нельзя смешивать типы ЧЕЛОВЕК и СОБАКА в одном генеалогическом древе.");
         }
     }
 

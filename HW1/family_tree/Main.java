@@ -9,7 +9,7 @@ import family_tree.writer.Writer;
 
 public class Main {
     public static void main(String[] args) {
-        FamilyTree familyTree = new FamilyTree();
+        FamilyTree<Human> familyTree = new FamilyTree(Human.class);
         familyTree.populateFamilyTree(Human.class);
 
         Writer fileHandler = new FileHandler();
