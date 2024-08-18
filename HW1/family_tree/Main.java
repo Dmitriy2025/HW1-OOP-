@@ -1,11 +1,10 @@
 package family_tree;
 
-import family_tree.console.FamilyTreeConsole;
-import family_tree.data.FamilyTree;
-import family_tree.data.Human;
-import family_tree.data.Dog;
-import family_tree.writer.FileHandler;
-import family_tree.writer.Writer;
+import family_tree.view.FamilyTreeConsole;
+import family_tree.model.data.FamilyTree;
+import family_tree.model.data.Human;
+import family_tree.model.writer.FileHandler;
+import family_tree.model.writer.Writer;
 
 public class Main {
     public static void main(String[] args) {

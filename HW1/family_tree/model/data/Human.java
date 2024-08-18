@@ -1,11 +1,11 @@
-package family_tree.data;
+package family_tree.model.data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Dog implements Serializable, Sortable {
+public class Human implements Serializable, Sortable {
     private static final long serialVersionUID = 1L;
 
     private int id;
@@ -16,7 +16,7 @@ public class Dog implements Serializable, Sortable {
     private List<Sortable> parents;
     private List<Sortable> children;
 
-    public Dog(int id, String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
+    public Human(int id, String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
         this.id = id;
         this.name = name;
         this.gender = gender;
@@ -43,20 +43,20 @@ public class Dog implements Serializable, Sortable {
 
     @Override
     public void addParent(Sortable parent) {
-        if (parent instanceof Dog) {
+        if (parent instanceof Human) {
             if (!parents.contains(parent)) {
                 this.parents.add(parent);
-                ((Dog) parent).addChild(this);
+                ((Human) parent).addChild(this);
             }
         }
     }
 
     @Override
     public void addChild(Sortable child) {
-        if (child instanceof Dog) {
+        if (child instanceof Human) {
             if (!children.contains(child)) {
                 this.children.add(child);
-                ((Dog) child).addParent(this);
+                ((Human) child).addParent(this);
             }
         }
     }
@@ -105,3 +105,5 @@ public class Dog implements Serializable, Sortable {
         return result.toString();
     }
 }
+
+

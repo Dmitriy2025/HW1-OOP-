@@ -1,12 +1,12 @@
-package family_tree.console;
+package family_tree.view;
 
-import family_tree.data.FamilyTree;
-import family_tree.data.Gender;
-import family_tree.data.Human;
-import family_tree.data.Dog;
-import family_tree.data.Sortable;
-import family_tree.writer.Writer;
-import org.w3c.dom.ls.LSOutput;
+import family_tree.model.data.FamilyTree;
+import family_tree.model.data.Gender;
+import family_tree.model.data.Human;
+import family_tree.model.data.Dog;
+import family_tree.model.data.Sortable;
+import family_tree.model.writer.Writer;
+import family_tree.presenter.Presenter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,76 +14,75 @@ import java.util.Scanner;
 
 
 public class FamilyTreeConsole<T extends Sortable> {
+    public FamilyTree<T> getFamilyTree() {
+        return familyTree;
+    }
+
     private FamilyTree<T> familyTree;
     private Writer fileHandler;
+    private Scanner scanner;
+    private Presenter presenter;
+    private boolean work;
+    private MainMenu menu;
 
     public FamilyTreeConsole(FamilyTree<T> familyTree, Writer fileHandler) {
         this.familyTree = familyTree;
         this.fileHandler = fileHandler;
+        scanner = new Scanner(System.in);
+        presenter = new Presenter(this);
+        work = true;
+        menu = new MainMenu(this);
     }
 
     public void showMenu() {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\nМеню:");
-            System.out.println("1. Показать генеалогическое древо");
-            System.out.println("2. Найти субъекта по имени или id");
-            System.out.println("3. Добавить субъект в генеалогическое древо");
-            System.out.println("4. Найти детей субъекта");
-            System.out.println("5. Найти родителей субъекта");
-            System.out.println("6. Сохранить генеалогическое древо в файл");
-            System.out.println("7. Загрузить генеалогическое древо из файла");
-            System.out.println("8. Сортировать по имени");
-            System.out.println("9. Сортировать по возрасту");
-            System.out.println("0. Выйти");
+            System.out.println(menu.menu());
 
             System.out.print("Выберите опцию: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            int choice;
+            try {
+                String strChoice = scanner.nextLine();
+                choice = Integer.parseInt(strChoice);
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: необходимо ввести число.");
+                continue;
+            }
 
-            switch (choice) {
-                case 1:
-                    System.out.println("Генеалогическое древо:");
-                    System.out.println(familyTree);
+            if (choice < 1 || choice > menu.getSize()) {
+                System.out.println("Неверный выбор. Выберете числа от 1 до " + menu.getSize());
+            } else {
+                menu.execute(choice);
+                if (choice == menu.getSize()) {
                     break;
-                case 2:
-                    findPersonInteractive();
-                    break;
-                case 3:
-                    addPersonInteractive();
-                    break;
-                case 4:
-                    findChildrenInteractive();
-                    break;
-                case 5:
-                    findParentsInteractive();
-                    break;
-                case 6:
-                    saveFamilyTreeInteractive();
-                    break;
-                case 7:
-                    loadFamilyTreeInteractive();
-                    break;
-                case 8:
-                    familyTree.sortByName();
-                    System.out.println("Генеалогическое древо отсортировано по имени:");
-                    System.out.println(familyTree);
-                    break;
-                case 9:
-                    familyTree.sortByAge();
-                    System.out.println("Генеалогическое древо отсортировано по возрасту:");
-                    System.out.println(familyTree);
-                    break;
-                case 0:
-                    System.out.println("Выход...");
-                    return;
-                default:
-                    System.out.println("Неверный выбор. Пожалуйста, попробуйте снова.");
+                }
             }
         }
     }
 
-    private void findPersonInteractive() {
+    public void exitProgram() {
+        System.out.println("Выход...");
+        work = false;
+    }
+
+    public void sortByAge() {
+        familyTree.sortByAge();
+        System.out.println("Генеалогическое древо отсортировано по возрасту:");
+        System.out.println(familyTree);
+    }
+
+    public void sortByName() {
+        familyTree.sortByName();
+        System.out.println("Генеалогическое древо отсортировано по имени:");
+        System.out.println(familyTree);
+    }
+
+    public void showFamilyTree() {
+        System.out.println("Генеалогическое древо:");
+        System.out.println(familyTree);
+    }
+
+    public void findPersonInteractive() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя или ID: ");
         String input = scanner.nextLine();
@@ -101,7 +100,7 @@ public class FamilyTreeConsole<T extends Sortable> {
         }
     }
 
-    private void addPersonInteractive() {
+    public void addPersonInteractive() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Введите тип (Человек/Собака): ");
@@ -176,7 +175,7 @@ public class FamilyTreeConsole<T extends Sortable> {
         System.out.println("Новый субъект " + typeName + " добавлен: " + newPerson);
     }
 
-    private void findChildrenInteractive() {
+    public void findChildrenInteractive() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя: ");
         String name = scanner.nextLine();
@@ -191,7 +190,7 @@ public class FamilyTreeConsole<T extends Sortable> {
         }
     }
 
-    private void findParentsInteractive() {
+    public void findParentsInteractive() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя: ");
         String name = scanner.nextLine();
@@ -206,7 +205,7 @@ public class FamilyTreeConsole<T extends Sortable> {
         }
     }
 
-    private void saveFamilyTreeInteractive() {
+    public void saveFamilyTreeInteractive() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя файла для сохранения: ");
         String filename = scanner.nextLine();
@@ -218,7 +217,7 @@ public class FamilyTreeConsole<T extends Sortable> {
         }
     }
 
-    private void loadFamilyTreeInteractive() {
+    public void loadFamilyTreeInteractive() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя файла для загрузки: ");
         String filename = scanner.nextLine();
