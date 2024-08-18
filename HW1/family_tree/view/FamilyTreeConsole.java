@@ -1,37 +1,33 @@
 package family_tree.view;
 
-import family_tree.model.data.FamilyTree;
 import family_tree.model.data.Gender;
 import family_tree.model.data.Human;
 import family_tree.model.data.Dog;
 import family_tree.model.data.Sortable;
-import family_tree.model.writer.Writer;
 import family_tree.presenter.Presenter;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Scanner;
 
-
-public class FamilyTreeConsole<T extends Sortable> {
-    public FamilyTree<T> getFamilyTree() {
-        return familyTree;
-    }
-
-    private FamilyTree<T> familyTree;
-    private Writer fileHandler;
+public class FamilyTreeConsole<T extends Sortable> implements View {
+    private Presenter<T> presenter;
     private Scanner scanner;
-    private Presenter presenter;
     private boolean work;
     private MainMenu menu;
 
-    public FamilyTreeConsole(FamilyTree<T> familyTree, Writer fileHandler) {
-        this.familyTree = familyTree;
-        this.fileHandler = fileHandler;
-        scanner = new Scanner(System.in);
-        presenter = new Presenter(this);
-        work = true;
-        menu = new MainMenu(this);
+    public FamilyTreeConsole(Presenter<T> presenter) {
+        this.presenter = presenter;
+        this.scanner = new Scanner(System.in);
+        this.work = true;
+        this.menu = new MainMenu(this);
+    }
+
+    @Override
+    public void start() {
+        presenter.populateFamilyTree((Class<T>) Human.class);
+        while (work) {
+            showMenu();
+        }
     }
 
     public void showMenu() {
@@ -61,43 +57,25 @@ public class FamilyTreeConsole<T extends Sortable> {
     }
 
     public void exitProgram() {
-        System.out.println("Выход...");
-        work = false;
+        presenter.exitProgram();
     }
 
     public void sortByAge() {
-        familyTree.sortByAge();
-        System.out.println("Генеалогическое древо отсортировано по возрасту:");
-        System.out.println(familyTree);
+        presenter.sortByAge();
     }
 
     public void sortByName() {
-        familyTree.sortByName();
-        System.out.println("Генеалогическое древо отсортировано по имени:");
-        System.out.println(familyTree);
+        presenter.sortByName();
     }
 
     public void showFamilyTree() {
-        System.out.println("Генеалогическое древо:");
-        System.out.println(familyTree);
+        presenter.showFamilyTree();
     }
 
     public void findPersonInteractive() {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя или ID: ");
         String input = scanner.nextLine();
-        Sortable person;
-        try {
-            int id = Integer.parseInt(input);
-            person = familyTree.findPersonById(id);
-        } catch (NumberFormatException e) {
-            person = familyTree.findPersonByName(input);
-        }
-        if (person != null) {
-            System.out.println("Найденный субъект: " + person);
-        } else {
-            System.out.println("Субъект не найден.");
-        }
+        presenter.findPerson(input);
     }
 
     public void addPersonInteractive() {
@@ -115,7 +93,7 @@ public class FamilyTreeConsole<T extends Sortable> {
             return;
         }
 
-        if (familyTree.getCurrentType() != null && !familyTree.getCurrentType().equals(type)) {
+        if (presenter.getCurrentType() != null && !presenter.getCurrentType().equals(type)) {
             System.out.println("Ошибка: нельзя смешивать типы ЧЕЛОВЕК и СОБАКА в одном генеалогическом древе.");
             return;
         }
@@ -143,14 +121,14 @@ public class FamilyTreeConsole<T extends Sortable> {
         String deathDateInput = scanner.nextLine();
         LocalDate deathDate = deathDateInput.isEmpty() ? null : LocalDate.parse(deathDateInput);
 
-        familyTree.addPerson(name, gender, birthDate, deathDate, type);
+        presenter.addPerson(name, gender, birthDate, deathDate, type);
 
-        Sortable newPerson = familyTree.findPersonByName(name);
+        Sortable newPerson = presenter.findPersonByName(name);
 
         System.out.print("Введите имя родителя (или оставьте пустым, если нет): ");
         String parentName = scanner.nextLine();
         if (!parentName.isEmpty()) {
-            Sortable parent = familyTree.findPersonByName(parentName);
+            Sortable parent = presenter.findPersonByName(parentName);
             if (parent != null) {
                 newPerson.addParent(parent);
                 System.out.println();
@@ -162,7 +140,7 @@ public class FamilyTreeConsole<T extends Sortable> {
         System.out.print("Введите имя ребенка (или оставьте пустым, если нет): ");
         String childName = scanner.nextLine();
         if (!childName.isEmpty()) {
-            Sortable child = familyTree.findPersonByName(childName);
+            Sortable child = presenter.findPersonByName(childName);
             if (child != null) {
                 newPerson.addChild(child);
                 System.out.println();
@@ -176,59 +154,32 @@ public class FamilyTreeConsole<T extends Sortable> {
     }
 
     public void findChildrenInteractive() {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя: ");
         String name = scanner.nextLine();
-        List<T> children = familyTree.getChildrenOf(name);
-        if (children != null && !children.isEmpty()) {
-            System.out.println("Дети субъекта " + name + ":");
-            for (T child : children) {
-                System.out.println(child);
-            }
-        } else {
-            System.out.println("Дети не найдены.");
-        }
+        presenter.findChildren(name);
     }
 
     public void findParentsInteractive() {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя: ");
         String name = scanner.nextLine();
-        List<T> parents = familyTree.getParentsOf(name);
-        if (parents != null && !parents.isEmpty()) {
-            System.out.println("Родители субъекта " + name + ":");
-            for (T parent : parents) {
-                System.out.println(parent);
-            }
-        } else {
-            System.out.println("Родители не найдены.");
-        }
+        presenter.findParents(name);
     }
 
     public void saveFamilyTreeInteractive() {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя файла для сохранения: ");
         String filename = scanner.nextLine();
-        fileHandler.setPath(filename);
-        if (fileHandler.saveFamilyTree(familyTree)) {
-            System.out.println("Генеалогическое древо сохранено в файл " + filename);
-        } else {
-            System.out.println("Ошибка при сохранении генеалогического древа.");
-        }
+        presenter.saveFamilyTree(filename);
     }
 
     public void loadFamilyTreeInteractive() {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Введите имя файла для загрузки: ");
         String filename = scanner.nextLine();
-        fileHandler.setPath(filename);
-        FamilyTree loadedFamilyTree = (FamilyTree) fileHandler.read();
-        if (loadedFamilyTree != null) {
-            familyTree = loadedFamilyTree;
-            System.out.println("Генеалогическое древо загружено из файла " + filename);
-        } else {
-            System.out.println("Ошибка при загрузке генеалогического древа.");
-        }
+        presenter.loadFamilyTree(filename);
+    }
+
+    @Override
+    public void printAnswer(String text) {
+        System.out.println(text);
     }
 }
 
