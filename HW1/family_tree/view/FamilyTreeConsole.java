@@ -1,30 +1,30 @@
 package family_tree.view;
 
+import family_tree.model.data.FamilyMember;
 import family_tree.model.data.Gender;
 import family_tree.model.data.Human;
 import family_tree.model.data.Dog;
-import family_tree.model.data.Sortable;
 import family_tree.presenter.Presenter;
 
 import java.time.LocalDate;
 import java.util.Scanner;
 
-public class FamilyTreeConsole<T extends Sortable> implements View {
+public class FamilyTreeConsole<T extends FamilyMember> implements View {
     private Presenter<T> presenter;
     private Scanner scanner;
     private boolean work;
-    private MainMenu menu;
+    private MainMenu<T> menu;
 
     public FamilyTreeConsole(Presenter<T> presenter) {
         this.presenter = presenter;
         this.scanner = new Scanner(System.in);
         this.work = true;
-        this.menu = new MainMenu(this);
+        this.menu = new MainMenu<>(this);
     }
 
     @Override
     public void start() {
-        presenter.populateFamilyTree((Class<T>) Human.class);
+        presenter.populateFamilyTree(presenter.getCurrentType());
         while (work) {
             showMenu();
         }
@@ -45,13 +45,9 @@ public class FamilyTreeConsole<T extends Sortable> implements View {
                 continue;
             }
 
-            if (choice < 1 || choice > menu.getSize()) {
-                System.out.println("Неверный выбор. Выберете числа от 1 до " + menu.getSize());
-            } else {
-                menu.execute(choice);
-                if (choice == menu.getSize()) {
-                    break;
-                }
+            menu.execute(choice);
+            if (choice == menu.getSize()) {
+                break;
             }
         }
     }
@@ -75,7 +71,12 @@ public class FamilyTreeConsole<T extends Sortable> implements View {
     public void findPersonInteractive() {
         System.out.print("Введите имя или ID: ");
         String input = scanner.nextLine();
-        presenter.findPerson(input);
+        try {
+            int id = Integer.parseInt(input);
+            presenter.findPersonById(id);
+        } catch (NumberFormatException e) {
+            presenter.findPersonByName(input);
+        }
     }
 
     public void addPersonInteractive() {
@@ -94,7 +95,7 @@ public class FamilyTreeConsole<T extends Sortable> implements View {
         }
 
         if (presenter.getCurrentType() != null && !presenter.getCurrentType().equals(type)) {
-            System.out.println("Ошибка: нельзя смешивать типы ЧЕЛОВЕК и СОБАКА в одном генеалогическом древе.");
+            System.out.println("Ошибка: нельзя смешивать различные типы существ в одном генеалогическом древе.");
             return;
         }
 
@@ -123,12 +124,12 @@ public class FamilyTreeConsole<T extends Sortable> implements View {
 
         presenter.addPerson(name, gender, birthDate, deathDate, type);
 
-        Sortable newPerson = presenter.findPersonByName(name);
+        FamilyMember newPerson = presenter.findPersonByName(name);
 
         System.out.print("Введите имя родителя (или оставьте пустым, если нет): ");
         String parentName = scanner.nextLine();
         if (!parentName.isEmpty()) {
-            Sortable parent = presenter.findPersonByName(parentName);
+            FamilyMember parent = presenter.findPersonByName(parentName);
             if (parent != null) {
                 newPerson.addParent(parent);
                 System.out.println();
@@ -140,7 +141,7 @@ public class FamilyTreeConsole<T extends Sortable> implements View {
         System.out.print("Введите имя ребенка (или оставьте пустым, если нет): ");
         String childName = scanner.nextLine();
         if (!childName.isEmpty()) {
-            Sortable child = presenter.findPersonByName(childName);
+            FamilyMember child = presenter.findPersonByName(childName);
             if (child != null) {
                 newPerson.addChild(child);
                 System.out.println();

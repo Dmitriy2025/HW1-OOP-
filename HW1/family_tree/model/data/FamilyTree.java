@@ -4,21 +4,15 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
-public class FamilyTree<T extends Sortable> implements Serializable, Iterable<T> {
+public class FamilyTree<T extends FamilyMember> implements Serializable, Iterable<T> {
     private static final long serialVersionUID = 1L;
 
     private List<T> people;
     private int nextId;
-    private Class<T> currentType;
 
     public FamilyTree(Class<T> type) {
         this.people = new ArrayList<>();
         this.nextId = 1;
-        this.currentType = type;
-    }
-
-    public Class<T> getCurrentType() {
-        return currentType;
     }
 
     public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate, Class<T> type) {
@@ -28,7 +22,7 @@ public class FamilyTree<T extends Sortable> implements Serializable, Iterable<T>
             this.people.add(newPerson);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Ошибка: нельзя смешивать типы ЧЕЛОВЕК и СОБАКА в одном генеалогическом древе.");
+            System.out.println("Ошибка: нельзя смешивать разные типы существ в одном генеалогическом древе.");
         }
     }
 
@@ -67,11 +61,11 @@ public class FamilyTree<T extends Sortable> implements Serializable, Iterable<T>
     }
 
     public void sortByName() {
-        Collections.sort(people, Comparator.comparing(Sortable::getName));
+        Collections.sort(people, Comparator.comparing(FamilyMember::getName));
     }
 
     public void sortByAge() {
-        Collections.sort(people, Comparator.comparing(Sortable::getBirthDate));
+        Collections.sort(people, Comparator.comparing(FamilyMember::getBirthDate));
     }
 
     @Override
@@ -127,6 +121,15 @@ public class FamilyTree<T extends Sortable> implements Serializable, Iterable<T>
         } else if (type == Dog.class) {
             addPerson("Рекс", Gender.Male, LocalDate.of(2015, 1, 1), null, type);
             addPerson("Лайка", Gender.Female, LocalDate.of(2018, 5, 5), null, type);
+            addPerson("Шарик", Gender.Male, LocalDate.of(2023, 3, 4), null, type);
+
+            T rex = findPersonByName("Рекс");
+            T laika = findPersonByName("Лайка");
+            T sharik = findPersonByName("Шарик");
+
+            rex.addChild(sharik);
+            laika.addChild(sharik);
+
         }
     }
 }

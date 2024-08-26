@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Dog implements Serializable, Sortable {
+public class Dog implements Serializable, FamilyMember {
     private static final long serialVersionUID = 1L;
 
     private int id;
@@ -13,8 +13,8 @@ public class Dog implements Serializable, Sortable {
     private Gender gender;
     private LocalDate birthDate;
     private LocalDate deathDate;
-    private List<Sortable> parents;
-    private List<Sortable> children;
+    private List<FamilyMember> parents;
+    private List<FamilyMember> children;
 
     public Dog(int id, String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
         this.id = id;
@@ -42,7 +42,7 @@ public class Dog implements Serializable, Sortable {
     }
 
     @Override
-    public void addParent(Sortable parent) {
+    public void addParent(FamilyMember parent) {
         if (parent instanceof Dog) {
             if (!parents.contains(parent)) {
                 this.parents.add(parent);
@@ -52,7 +52,7 @@ public class Dog implements Serializable, Sortable {
     }
 
     @Override
-    public void addChild(Sortable child) {
+    public void addChild(FamilyMember child) {
         if (child instanceof Dog) {
             if (!children.contains(child)) {
                 this.children.add(child);
@@ -62,12 +62,12 @@ public class Dog implements Serializable, Sortable {
     }
 
     @Override
-    public List<Sortable> getChildren() {
+    public List<FamilyMember> getChildren() {
         return new ArrayList<>(children);
     }
 
     @Override
-    public List<Sortable> getParents() {
+    public List<FamilyMember> getParents() {
         return new ArrayList<>(parents);
     }
 
@@ -84,7 +84,7 @@ public class Dog implements Serializable, Sortable {
 
         if (!parents.isEmpty()) {
             result.append("; родители: ");
-            for (Sortable parent : parents) {
+            for (FamilyMember parent : parents) {
                 result.append(parent.getName()).append(", ");
             }
             if (result.length() > 0) {
@@ -94,7 +94,7 @@ public class Dog implements Serializable, Sortable {
 
         if (!children.isEmpty()) {
             result.append("; дети: ");
-            for (Sortable child : children) {
+            for (FamilyMember child : children) {
                 result.append(child.getName()).append(", ");
             }
             if (result.length() > 0) {

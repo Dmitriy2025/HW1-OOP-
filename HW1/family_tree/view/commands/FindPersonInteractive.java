@@ -1,8 +1,8 @@
 package family_tree.view.commands;
 
-import family_tree.model.data.Sortable;
+import family_tree.model.data.FamilyMember;
 import family_tree.view.FamilyTreeConsole;
-public class FindPersonInteractive<T extends Sortable> extends Command<T> {
+public class FindPersonInteractive<T extends FamilyMember> extends Command<T> {
 
     public FindPersonInteractive(FamilyTreeConsole<T> console) {
         super(console);

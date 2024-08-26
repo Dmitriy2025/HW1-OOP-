@@ -1,17 +1,28 @@
 package family_tree;
 
+import family_tree.model.FamilyTreeService;
+import family_tree.model.data.Dog;
 import family_tree.model.data.Human;
-import family_tree.presenter.Presenter;
+import family_tree.model.writer.FileHandler;
 import family_tree.view.FamilyTreeConsole;
+import family_tree.presenter.Presenter;
+
 
 public class Main {
     public static void main(String[] args) {
 
-        Presenter<Human> presenter = new Presenter<>(null);
+        FileHandler fileHandler = new FileHandler();
+        fileHandler.setPath("family_tree.dat");
 
-        FamilyTreeConsole<Human> familyTreeConsole = new FamilyTreeConsole<>(presenter);
-        presenter.setView(familyTreeConsole);
+        FamilyTreeService<Dog> familyTreeService = new FamilyTreeService<>(Dog.class, fileHandler);
 
-        familyTreeConsole.start();
+
+        Presenter<Dog> presenter = new Presenter<>(familyTreeService, null);
+
+        FamilyTreeConsole<Dog> view = new FamilyTreeConsole<>(presenter);
+
+        presenter.setView(view);
+
+        view.start();
     }
 }

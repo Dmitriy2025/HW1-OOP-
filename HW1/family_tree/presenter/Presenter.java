@@ -1,23 +1,19 @@
 package family_tree.presenter;
 
-import family_tree.model.data.FamilyTree;
-import family_tree.model.data.Gender;
-import family_tree.model.data.Sortable;
-import family_tree.model.writer.FileHandler;
-import family_tree.model.writer.Writer;
+import family_tree.model.FamilyTreeService;
+import family_tree.model.data.*;
 import family_tree.view.View;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public class Presenter<T extends Sortable> {
+public class Presenter<T extends FamilyMember> {
+    private FamilyTreeService<T> familyTreeService;
     private View view;
-    private final Writer fileHandler;
-    private FamilyTree<T> familyTree;
 
-    public Presenter(View view) {
+    public Presenter(FamilyTreeService<T> familyTreeService, View view) {
+        this.familyTreeService = familyTreeService;
         this.view = view;
-        this.fileHandler = new FileHandler();
     }
 
     public void setView(View view) {
@@ -25,113 +21,107 @@ public class Presenter<T extends Sortable> {
     }
 
     public void populateFamilyTree(Class<T> type) {
-        familyTree = new FamilyTree<>(type);
-        familyTree.populateFamilyTree(type);
-        if (view != null) {
-            view.printAnswer("Генеалогическое древо успешно создано и заполнено.");
-        }
-    }
-
-    public void setFamilyTree(FamilyTree<T> familyTree) {
-        this.familyTree = familyTree;
-    }
-
-    public void showFamilyTree() {
-        if (view != null && familyTree != null) {
-            view.printAnswer("Генеалогическое древо:");
-            view.printAnswer(familyTree.toString());
-        } else {
-            if (view != null) {
-                view.printAnswer("Генеалогическое древо не доступно.");
-            }
-        }
-    }
-
-    public void sortByName () {
-        familyTree.sortByName();
-        view.printAnswer("Генеалогическое древо отсортировано по имени:");
-        view.printAnswer(familyTree.toString());
-    }
-    public void sortByAge () {
-        familyTree.sortByAge();
-        view.printAnswer("Генеалогическое древо отсортировано по возрасту:");
-        view.printAnswer(familyTree.toString());
-    }
-
-    public void findPerson(String input) {
-        Sortable person;
-        try {
-            int id = Integer.parseInt(input);
-            person = familyTree.findPersonById(id);
-        } catch (NumberFormatException e) {
-            person = familyTree.findPersonByName(input);
-        }
-        if (person != null) {
-            view.printAnswer("Найденный субъект: " + person);
-        } else {
-            view.printAnswer("Субъект не найден.");
-        }
+        familyTreeService.initializeFamilyTree(type);
+        view.printAnswer("Семейное древо инициализировано для типа: " + type.getSimpleName());
     }
 
     public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate, Class<T> type) {
-        familyTree.addPerson(name, gender, birthDate, deathDate, type);
-        Sortable newPerson = familyTree.findPersonByName(name);
-        view.printAnswer("Новый субъект добавлен: " + newPerson);
+        if (!type.equals(familyTreeService.getCurrentType())) {
+            view.printAnswer("Ошибка: нельзя смешивать различные типы существ в одном генеалогическом древе.");
+            return;
+        }
+        familyTreeService.addPerson(name, gender, birthDate, deathDate);
+        view.printAnswer("Добавлен новый " + (type.equals(Human.class) ? "человек" : "питомец") + ": " + name);
     }
 
-    public T findPersonByName(String name) {
-        return familyTree.findPersonByName(name);
+    public FamilyMember findPersonByName(String name) {
+        FamilyMember member = familyTreeService.findPersonByName(name);
+        if (member != null) {
+            return member;
+        } else {
+            view.printAnswer("Субъект с именем " + name + " не найден.");
+            return null;
+        }
+    }
+
+    public void findPersonById(int id) {
+        FamilyMember member = familyTreeService.findPersonById(id);
+        if (member != null) {
+            view.printAnswer("Субъект с ID " + id + ": " + member);
+        } else {
+            view.printAnswer("Субъект с ID " + id + " не найден.");
+        }
     }
 
     public void findChildren(String name) {
-        List<T> children = familyTree.getChildrenOf(name);
+        List<T> children = familyTreeService.getChildrenOf(name);
         if (children != null && !children.isEmpty()) {
-            view.printAnswer("Дети субъекта " + name + ":");
+            StringBuilder childrenStr = new StringBuilder();
             for (T child : children) {
-                view.printAnswer(child.toString());
+                if (childrenStr.length() > 0) {
+                    childrenStr.append(";\n ");
+                }
+                childrenStr.append(child);
             }
+            view.printAnswer("Дети субъекта " + name + ":\n " + childrenStr.toString());
         } else {
-            view.printAnswer("Дети не найдены.");
+            view.printAnswer("У субъекта с именем " + name + " нет детей.");
         }
     }
 
     public void findParents(String name) {
-        List<T> parents = familyTree.getParentsOf(name);
+        List<T> parents = familyTreeService.getParentsOf(name);
         if (parents != null && !parents.isEmpty()) {
-            view.printAnswer("Родители субъекта " + name + ":");
+            StringBuilder parentsStr = new StringBuilder();
             for (T parent : parents) {
-                view.printAnswer(parent.toString());
+                if (parentsStr.length() > 0) {
+                    parentsStr.append(";\n ");
+                }
+                parentsStr.append(parent);
             }
+            view.printAnswer("Родители субъекта " + name + ":\n " + parentsStr.toString());
         } else {
-            view.printAnswer("Родители не найдены.");
+            view.printAnswer("У субъекта с именем " + name + " нет родителей.");
         }
     }
 
-    public Class<T> getCurrentType() {
-        return familyTree.getCurrentType();
+    public void sortByAge() {
+        familyTreeService.sortByAge();
+        view.printAnswer("Семейное древо отсортировано по возрасту.");
+        showFamilyTree();
+    }
+
+    public void sortByName() {
+        familyTreeService.sortByName();
+        view.printAnswer("Семейное древо отсортировано по имени.");
+        showFamilyTree();
+    }
+
+    public void showFamilyTree() {
+        view.printAnswer(familyTreeService.toString());
     }
 
     public void saveFamilyTree(String filename) {
-        if (familyTree != null) {
-            fileHandler.setPath(filename);
-            boolean success = fileHandler.saveFamilyTree(familyTree);
-            if (success) {
-                view.printAnswer("Генеалогическое древо сохранено в файл " + filename);
-            } else {
-                view.printAnswer("Ошибка при сохранении генеалогического древа.");
-            }
+        boolean success = familyTreeService.saveFamilyTree();
+        if (success) {
+            view.printAnswer("Семейное древо успешно сохранено в файл " + filename);
+        } else {
+            view.printAnswer("Не удалось сохранить семейное древо.");
         }
     }
 
     public void loadFamilyTree(String filename) {
-        fileHandler.setPath(filename);
-        FamilyTree<T> loadedFamilyTree = (FamilyTree<T>) fileHandler.read();
-        if (loadedFamilyTree != null) {
-            this.familyTree = loadedFamilyTree;
-            view.printAnswer("Генеалогическое древо загружено из файла " + filename);
+        FamilyTree<T> tree = familyTreeService.loadFamilyTree();
+        if (tree != null) {
+            view.printAnswer("Семейное древо успешно загружено из файла " + filename);
+            showFamilyTree();
         } else {
-            view.printAnswer("Ошибка при загрузке генеалогического древа.");
+            view.printAnswer("Не удалось загрузить семейное древо.");
         }
+    }
+
+    public Class<T> getCurrentType() {
+        return familyTreeService.getCurrentType();
     }
 
     public void exitProgram() {
@@ -139,3 +129,4 @@ public class Presenter<T extends Sortable> {
         System.exit(0);
     }
 }
+

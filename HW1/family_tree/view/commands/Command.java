@@ -1,9 +1,9 @@
 package family_tree.view.commands;
 
+import family_tree.model.data.FamilyMember;
 import family_tree.view.FamilyTreeConsole;
-import family_tree.model.data.Sortable;
 
-public abstract class Command<T extends Sortable> {
+public abstract class Command<T extends FamilyMember> {
     protected FamilyTreeConsole<T> console;
 
     public Command(FamilyTreeConsole<T> console) {

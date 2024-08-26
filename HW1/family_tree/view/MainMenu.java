@@ -1,12 +1,12 @@
 package family_tree.view;
 
+import family_tree.model.data.FamilyMember;
 import family_tree.view.commands.*;
-import family_tree.model.data.Sortable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainMenu<T extends Sortable> {
+public class MainMenu<T extends FamilyMember> {
     private final List<Command<T>> commandList;
 
     public MainMenu(FamilyTreeConsole<T> familyTC) {
@@ -35,8 +35,12 @@ public class MainMenu<T extends Sortable> {
         return stringBuilder.toString();
     }
 
-    public void execute(int choice){
-        Command<T> command = commandList.get(choice-1);
+    public void execute(int choice) {
+        if (choice < 1 || choice > commandList.size()) {
+            System.out.println("Неверный выбор. Выберите число от 1 до " + commandList.size());
+            return;
+        }
+        Command<T> command = commandList.get(choice - 1);
         command.execute();
     }
 
