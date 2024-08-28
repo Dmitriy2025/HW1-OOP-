@@ -81,57 +81,6 @@ public class FamilyTree<T extends FamilyMember> implements Serializable, Iterabl
         }
         return sb.toString();
     }
-
-    public void populateFamilyTree(Class<T> type) {
-        if (type == Human.class) {
-            addPerson("Иван", Gender.Male, LocalDate.of(1954, 1, 1), null, type);
-            addPerson("Мария", Gender.Female, LocalDate.of(1956, 2, 2), null, type);
-            addPerson("Павел", Gender.Male, LocalDate.of(1979, 3, 3), null, type);
-            addPerson("Людмила", Gender.Female, LocalDate.of(1982, 4, 4), null, type);
-            addPerson("Михаил", Gender.Male, LocalDate.of(2004, 5, 5), null, type);
-            addPerson("Елена", Gender.Female, LocalDate.of(2006, 6, 6), null, type);
-            addPerson("Дмитрий", Gender.Male, LocalDate.of(2008, 7, 7), null, type);
-            addPerson("Анна", Gender.Female, LocalDate.of(1995, 8, 8), null, type);
-            addPerson("Сергей", Gender.Male, LocalDate.of(2019, 9, 9), null, type);
-            addPerson("Лариса", Gender.Female, LocalDate.of(2021, 10, 10), null, type);
-
-            T ivan = findPersonByName("Иван");
-            T maria = findPersonByName("Мария");
-            T pavel = findPersonByName("Павел");
-            T lyudmila = findPersonByName("Людмила");
-            T mikhail = findPersonByName("Михаил");
-            T elena = findPersonByName("Елена");
-            T dmitry = findPersonByName("Дмитрий");
-            T anna = findPersonByName("Анна");
-            T sergey = findPersonByName("Сергей");
-            T larisa = findPersonByName("Лариса");
-
-            ivan.addChild(pavel);
-            ivan.addChild(lyudmila);
-            maria.addChild(pavel);
-            maria.addChild(lyudmila);
-
-            pavel.addChild(mikhail);
-            pavel.addChild(elena);
-            lyudmila.addChild(dmitry);
-            lyudmila.addChild(anna);
-
-            anna.addChild(sergey);
-            anna.addChild(larisa);
-        } else if (type == Dog.class) {
-            addPerson("Рекс", Gender.Male, LocalDate.of(2015, 1, 1), null, type);
-            addPerson("Лайка", Gender.Female, LocalDate.of(2018, 5, 5), null, type);
-            addPerson("Шарик", Gender.Male, LocalDate.of(2023, 3, 4), null, type);
-
-            T rex = findPersonByName("Рекс");
-            T laika = findPersonByName("Лайка");
-            T sharik = findPersonByName("Шарик");
-
-            rex.addChild(sharik);
-            laika.addChild(sharik);
-
-        }
-    }
 }
 
 

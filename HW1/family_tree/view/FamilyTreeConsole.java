@@ -82,7 +82,7 @@ public class FamilyTreeConsole<T extends FamilyMember> implements View {
     public void addPersonInteractive() {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Введите тип (Человек/Собака): ");
+        System.out.print("Введите тип существа: ");
         String typeInput = scanner.nextLine();
         Class<T> type;
         if ("Человек".equalsIgnoreCase(typeInput)) {

@@ -18,7 +18,7 @@ public class FamilyTreeService<T extends FamilyMember> {
         this.type = type;
     }
 
-    public void initializeFamilyTree(Class<T> type) {
+    public void populateFamilyTree(Class<T> type) {
         this.builder = new FamilyTreeBuilder<>(type);
         this.builder.populateFamilyTree(type);
     }

@@ -21,7 +21,7 @@ public class Presenter<T extends FamilyMember> {
     }
 
     public void populateFamilyTree(Class<T> type) {
-        familyTreeService.initializeFamilyTree(type);
+        familyTreeService.populateFamilyTree(type);
         view.printAnswer("Семейное древо инициализировано для типа: " + type.getSimpleName());
     }
 
@@ -37,6 +37,7 @@ public class Presenter<T extends FamilyMember> {
     public FamilyMember findPersonByName(String name) {
         FamilyMember member = familyTreeService.findPersonByName(name);
         if (member != null) {
+            view.printAnswer("Субъект найден:\n " + member);
             return member;
         } else {
             view.printAnswer("Субъект с именем " + name + " не найден.");
@@ -47,7 +48,7 @@ public class Presenter<T extends FamilyMember> {
     public void findPersonById(int id) {
         FamilyMember member = familyTreeService.findPersonById(id);
         if (member != null) {
-            view.printAnswer("Субъект с ID " + id + ": " + member);
+            view.printAnswer("Субъект найден:\n " + member);
         } else {
             view.printAnswer("Субъект с ID " + id + " не найден.");
         }

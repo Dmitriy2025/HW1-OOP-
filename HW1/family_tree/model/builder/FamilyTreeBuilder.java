@@ -14,7 +14,7 @@ public class FamilyTreeBuilder<T extends FamilyMember> {
     }
 
     public void populateFamilyTree (Class<T> type) {
-        familyTree.populateFamilyTree(type);;
+        FamilyTreePopulator.populateFamilyTree(familyTree, type);;
     }
 
     public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
