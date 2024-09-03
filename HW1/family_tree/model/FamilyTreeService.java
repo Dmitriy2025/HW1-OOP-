@@ -2,6 +2,7 @@ package family_tree.model;
 
 import family_tree.model.builder.FamilyTreeBuilder;
 import family_tree.model.data.*;
+import family_tree.model.writer.FileHandler;
 import family_tree.model.writer.Writer;
 
 import java.time.LocalDate;
@@ -19,7 +20,6 @@ public class FamilyTreeService<T extends FamilyMember> {
     }
 
     public void populateFamilyTree(Class<T> type) {
-        this.builder = new FamilyTreeBuilder<>(type);
         this.builder.populateFamilyTree(type);
     }
 
@@ -51,11 +51,13 @@ public class FamilyTreeService<T extends FamilyMember> {
         builder.sortByAge();
     }
 
-    public boolean saveFamilyTree() {
+    public boolean saveFamilyTree(String filename) {
+        writer.setPath(filename);
         return writer.saveFamilyTree(builder.build());
     }
 
-    public FamilyTree<T> loadFamilyTree() {
+    public FamilyTree<T> loadFamilyTree(String filename) {
+        writer.setPath(filename);
         return (FamilyTree<T>) writer.read();
     }
 

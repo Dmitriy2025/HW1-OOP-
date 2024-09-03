@@ -2,6 +2,8 @@ package family_tree.presenter;
 
 import family_tree.model.FamilyTreeService;
 import family_tree.model.data.*;
+import family_tree.model.writer.FileHandler;
+import family_tree.model.writer.Writer;
 import family_tree.view.View;
 
 import java.time.LocalDate;
@@ -103,7 +105,7 @@ public class Presenter<T extends FamilyMember> {
     }
 
     public void saveFamilyTree(String filename) {
-        boolean success = familyTreeService.saveFamilyTree();
+        boolean success = familyTreeService.saveFamilyTree(filename);
         if (success) {
             view.printAnswer("Семейное древо успешно сохранено в файл " + filename);
         } else {
@@ -112,7 +114,7 @@ public class Presenter<T extends FamilyMember> {
     }
 
     public void loadFamilyTree(String filename) {
-        FamilyTree<T> tree = familyTreeService.loadFamilyTree();
+        FamilyTree<T> tree = familyTreeService.loadFamilyTree(filename);
         if (tree != null) {
             view.printAnswer("Семейное древо успешно загружено из файла " + filename);
             showFamilyTree();

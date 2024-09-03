@@ -1,7 +1,10 @@
 package family_tree;
 
 import family_tree.model.FamilyTreeService;
+import family_tree.model.builder.FamilyTreeBuilder;
 import family_tree.model.data.Dog;
+import family_tree.model.data.FamilyTree;
+import family_tree.model.data.FamilyTreePopulator;
 import family_tree.model.data.Human;
 import family_tree.model.writer.FileHandler;
 import family_tree.view.FamilyTreeConsole;
@@ -10,9 +13,7 @@ import family_tree.presenter.Presenter;
 
 public class Main {
     public static void main(String[] args) {
-
         FileHandler fileHandler = new FileHandler();
-        fileHandler.setPath("family_tree.dat");
 
         FamilyTreeService<Dog> familyTreeService = new FamilyTreeService<>(Dog.class, fileHandler);
 
@@ -23,6 +24,6 @@ public class Main {
 
         presenter.setView(view);
 
-        view.start();
+       view.start();
     }
 }

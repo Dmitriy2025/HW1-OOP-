@@ -1,28 +1,19 @@
 package family_tree.model.data;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.*;
 
 public class FamilyTree<T extends FamilyMember> implements Serializable, Iterable<T> {
     private static final long serialVersionUID = 1L;
-
     private List<T> people;
-    private int nextId;
 
     public FamilyTree(Class<T> type) {
         this.people = new ArrayList<>();
-        this.nextId = 1;
     }
 
-    public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate, Class<T> type) {
-        try {
-            T newPerson = type.getConstructor(int.class, String.class, Gender.class, LocalDate.class, LocalDate.class)
-                    .newInstance(nextId++, name, gender, birthDate, deathDate);
-            this.people.add(newPerson);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Ошибка: нельзя смешивать разные типы существ в одном генеалогическом древе.");
+    public void addMember(T member) {
+        if (!people.contains(member)) {
+            people.add(member);
         }
     }
 

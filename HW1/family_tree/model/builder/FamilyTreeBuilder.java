@@ -1,29 +1,50 @@
 package family_tree.model.builder;
 
 import family_tree.model.data.*;
-
 import java.time.LocalDate;
 
 public class FamilyTreeBuilder<T extends FamilyMember> {
     private FamilyTree<T> familyTree;
     private Class<T> type;
+    private int nextId;
 
     public FamilyTreeBuilder(Class<T> type) {
         this.familyTree = new FamilyTree<>(type);
         this.type = type;
+        this.nextId = determineNextId();
     }
 
-    public void populateFamilyTree (Class<T> type) {
-        FamilyTreePopulator.populateFamilyTree(familyTree, type);;
+    private int determineNextId() {
+        int maxId = 0;
+        for (T member : familyTree) {
+            if (member.getId() > maxId) {
+                maxId = member.getId();
+            }
+        }
+        return maxId + 1;
     }
+
 
     public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
         try {
-            familyTree.addPerson(name, gender, birthDate, deathDate, type);
+            T newPerson = type.getConstructor(int.class, String.class, Gender.class, LocalDate.class, LocalDate.class)
+                    .newInstance(nextId++, name, gender, birthDate, deathDate);
+            this.familyTree.addMember(newPerson);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Ошибка: нельзя смешивать разные типы существ в одном генеалогическом древе.");
         }
+    }
+
+    public void populateFamilyTree(Class<T> type) {
+        if (type.equals(Human.class)) {
+            this.familyTree = (FamilyTree<T>) FamilyTreePopulator.populateHumanTree();
+        } else if (type.equals(Dog.class)) {
+            this.familyTree = (FamilyTree<T>) FamilyTreePopulator.populateDogTree();
+        } else {
+            System.out.println("Ошибка: неизвестный тип");
+        }
+        this.nextId = determineNextId();
     }
 
     public FamilyTreeBuilder<T> addParentTo(String childName, String parentName) {
