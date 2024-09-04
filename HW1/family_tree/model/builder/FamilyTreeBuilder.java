@@ -4,13 +4,13 @@ import family_tree.model.data.*;
 import java.time.LocalDate;
 
 public class FamilyTreeBuilder<T extends FamilyMember> {
-    private FamilyTree<T> familyTree;
     private Class<T> type;
+    private FamilyTree<T> familyTree;
     private int nextId;
 
     public FamilyTreeBuilder(Class<T> type) {
-        this.familyTree = new FamilyTree<>(type);
         this.type = type;
+        this.familyTree = new FamilyTree<>();
         this.nextId = determineNextId();
     }
 
@@ -24,27 +24,32 @@ public class FamilyTreeBuilder<T extends FamilyMember> {
         return maxId + 1;
     }
 
+    public Class<T> getType() {
+        return type;
+    }
 
-    public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
+    public T addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
         try {
             T newPerson = type.getConstructor(int.class, String.class, Gender.class, LocalDate.class, LocalDate.class)
                     .newInstance(nextId++, name, gender, birthDate, deathDate);
-            this.familyTree.addMember(newPerson);
+            familyTree.addMember(newPerson);
+            return newPerson;
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Ошибка: нельзя смешивать разные типы существ в одном генеалогическом древе.");
+            throw new RuntimeException("Ошибка: нельзя смешивать разные типы существ в одном генеалогическом древе.");
         }
     }
 
-    public void populateFamilyTree(Class<T> type) {
+    public FamilyTree<T> populateFamilyTree(Class<T> type) {
         if (type.equals(Human.class)) {
-            this.familyTree = (FamilyTree<T>) FamilyTreePopulator.populateHumanTree();
+           this.familyTree = (FamilyTree<T>)FamilyTreePopulator.populateHumanTree();
         } else if (type.equals(Dog.class)) {
-            this.familyTree = (FamilyTree<T>) FamilyTreePopulator.populateDogTree();
+            this.familyTree =  (FamilyTree<T>) FamilyTreePopulator.populateDogTree();
         } else {
             System.out.println("Ошибка: неизвестный тип");
+            return null;
         }
         this.nextId = determineNextId();
+        return this.familyTree;
     }
 
     public FamilyTreeBuilder<T> addParentTo(String childName, String parentName) {
@@ -62,16 +67,6 @@ public class FamilyTreeBuilder<T extends FamilyMember> {
         if (parent != null && child != null) {
             parent.addChild(child);
         }
-        return this;
-    }
-
-    public FamilyTreeBuilder<T> sortByName() {
-        familyTree.sortByName();
-        return this;
-    }
-
-    public FamilyTreeBuilder<T> sortByAge() {
-        familyTree.sortByAge();
         return this;
     }
 

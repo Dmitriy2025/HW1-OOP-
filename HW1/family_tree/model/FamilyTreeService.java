@@ -2,7 +2,6 @@ package family_tree.model;
 
 import family_tree.model.builder.FamilyTreeBuilder;
 import family_tree.model.data.*;
-import family_tree.model.writer.FileHandler;
 import family_tree.model.writer.Writer;
 
 import java.time.LocalDate;
@@ -10,50 +9,51 @@ import java.util.List;
 
 public class FamilyTreeService<T extends FamilyMember> {
     private FamilyTreeBuilder<T> builder;
+    private FamilyTree<T> familyTree;
     private Writer writer;
-    private Class<T> type;
 
-    public FamilyTreeService(Class<T> type, Writer writer) {
-        this.builder = new FamilyTreeBuilder<>(type);
+    public FamilyTreeService(FamilyTreeBuilder<T> builder, Writer writer) {
+        this.builder = builder;
+        this.familyTree = builder.build();
         this.writer = writer;
-        this.type = type;
     }
 
     public void populateFamilyTree(Class<T> type) {
-        this.builder.populateFamilyTree(type);
+        this.familyTree = builder.populateFamilyTree(type);
     }
 
     public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
-        builder.addPerson(name, gender, birthDate, deathDate);
+        T newPerson = builder.addPerson(name, gender, birthDate, deathDate);
+        this.familyTree.addMember(newPerson);
     }
 
     public T findPersonByName(String name) {
-        return builder.build().findPersonByName(name);
+        return familyTree.findPersonByName(name);
     }
 
     public T findPersonById(int id) {
-        return builder.build().findPersonById(id);
+        return familyTree.findPersonById(id);
     }
 
     public List<T> getChildrenOf(String name) {
-        return builder.build().getChildrenOf(name);
+        return familyTree.getChildrenOf(name);
     }
 
     public List<T> getParentsOf(String name) {
-        return builder.build().getParentsOf(name);
+        return familyTree.getParentsOf(name);
     }
 
     public void sortByName() {
-        builder.sortByName();
+        familyTree.sortByName();
     }
 
     public void sortByAge() {
-        builder.sortByAge();
+        familyTree.sortByAge();
     }
 
     public boolean saveFamilyTree(String filename) {
         writer.setPath(filename);
-        return writer.saveFamilyTree(builder.build());
+        return writer.saveFamilyTree(familyTree);
     }
 
     public FamilyTree<T> loadFamilyTree(String filename) {
@@ -61,8 +61,12 @@ public class FamilyTreeService<T extends FamilyMember> {
         return (FamilyTree<T>) writer.read();
     }
 
-    public Class<T> getCurrentType() {
-        return type;
+    public FamilyTree<T> getFamilyTree() {
+        return familyTree;
+    }
+
+    public Class<T> getMemberType() {
+        return builder.getType();
     }
 
     public Writer getWriter() {
@@ -71,7 +75,7 @@ public class FamilyTreeService<T extends FamilyMember> {
 
     @Override
     public String toString() {
-        return builder.toString();
+        return getFamilyTree().toString();
     }
 }
 

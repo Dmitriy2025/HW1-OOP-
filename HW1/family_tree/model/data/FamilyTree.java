@@ -7,7 +7,7 @@ public class FamilyTree<T extends FamilyMember> implements Serializable, Iterabl
     private static final long serialVersionUID = 1L;
     private List<T> people;
 
-    public FamilyTree(Class<T> type) {
+    public FamilyTree() {
         this.people = new ArrayList<>();
     }
 

@@ -22,9 +22,12 @@ public class FamilyTreeConsole<T extends FamilyMember> implements View {
         this.menu = new MainMenu<>(this);
     }
 
+    public Class<T> getMemberType() {
+        return presenter.getMemberType();
+    }
     @Override
     public void start() {
-        presenter.populateFamilyTree(presenter.getCurrentType());
+        presenter.populateFamilyTree(getMemberType());
         while (work) {
             showMenu();
         }
@@ -94,7 +97,7 @@ public class FamilyTreeConsole<T extends FamilyMember> implements View {
             return;
         }
 
-        if (presenter.getCurrentType() != null && !presenter.getCurrentType().equals(type)) {
+        if (presenter.getMemberType() != null && !presenter.getMemberType().equals(type)) {
             System.out.println("Ошибка: нельзя смешивать различные типы существ в одном генеалогическом древе.");
             return;
         }
@@ -122,7 +125,7 @@ public class FamilyTreeConsole<T extends FamilyMember> implements View {
         String deathDateInput = scanner.nextLine();
         LocalDate deathDate = deathDateInput.isEmpty() ? null : LocalDate.parse(deathDateInput);
 
-        presenter.addPerson(name, gender, birthDate, deathDate, type);
+        presenter.addPerson(name, gender, birthDate, deathDate);
 
         FamilyMember newPerson = presenter.findPersonByName(name);
 

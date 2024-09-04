@@ -15,15 +15,14 @@ public class Main {
     public static void main(String[] args) {
         FileHandler fileHandler = new FileHandler();
 
-        FamilyTreeService<Dog> familyTreeService = new FamilyTreeService<>(Dog.class, fileHandler);
+        FamilyTreeBuilder<Human> familyTreeBuilder = new FamilyTreeBuilder<>(Human.class);
+        FamilyTreeService<Human> familyTreeService = new FamilyTreeService<>(familyTreeBuilder, fileHandler);
 
 
-        Presenter<Dog> presenter = new Presenter<>(familyTreeService, null);
-
-        FamilyTreeConsole<Dog> view = new FamilyTreeConsole<>(presenter);
+        Presenter<Human> presenter = new Presenter<>(familyTreeService, null);
+        FamilyTreeConsole<Human> view = new FamilyTreeConsole<>(presenter);
 
         presenter.setView(view);
-
-       view.start();
+        view.start();
     }
 }

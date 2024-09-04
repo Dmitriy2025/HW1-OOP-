@@ -2,8 +2,6 @@ package family_tree.presenter;
 
 import family_tree.model.FamilyTreeService;
 import family_tree.model.data.*;
-import family_tree.model.writer.FileHandler;
-import family_tree.model.writer.Writer;
 import family_tree.view.View;
 
 import java.time.LocalDate;
@@ -22,18 +20,18 @@ public class Presenter<T extends FamilyMember> {
         this.view = view;
     }
 
+    public Class<T> getMemberType() {
+        return familyTreeService.getMemberType();
+    }
+
     public void populateFamilyTree(Class<T> type) {
         familyTreeService.populateFamilyTree(type);
         view.printAnswer("Семейное древо инициализировано для типа: " + type.getSimpleName());
     }
 
-    public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate, Class<T> type) {
-        if (!type.equals(familyTreeService.getCurrentType())) {
-            view.printAnswer("Ошибка: нельзя смешивать различные типы существ в одном генеалогическом древе.");
-            return;
-        }
+    public void addPerson(String name, Gender gender, LocalDate birthDate, LocalDate deathDate) {
         familyTreeService.addPerson(name, gender, birthDate, deathDate);
-        view.printAnswer("Добавлен новый " + (type.equals(Human.class) ? "человек" : "питомец") + ": " + name);
+        view.printAnswer("Добавлен новый субъект: " + name);
     }
 
     public FamilyMember findPersonByName(String name) {
@@ -121,10 +119,6 @@ public class Presenter<T extends FamilyMember> {
         } else {
             view.printAnswer("Не удалось загрузить семейное древо.");
         }
-    }
-
-    public Class<T> getCurrentType() {
-        return familyTreeService.getCurrentType();
     }
 
     public void exitProgram() {
